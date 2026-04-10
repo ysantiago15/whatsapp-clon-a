@@ -122,8 +122,7 @@ export default function Estados() {
                 </div>
             </div>
 
-            {/* ── Panel derecho / Vista del estado ──
-                En móvil: pantalla completa cuando hay estado seleccionado */}
+            {
             <div className={`
                 ${estadoViendo ? "flex" : "hidden"} md:flex
                 flex-1 bg-[#F7F5F3] flex-col items-center justify-center
@@ -144,7 +143,6 @@ export default function Estados() {
                                 <p className="text-gray-300 text-xs">{estadoViendo.hora}</p>
                             </div>
                         </div>
-                        {/* Imagen */}
                         <img
                             src={estadoViendo.imagen}
                             alt="estado"

@@ -19,7 +19,6 @@ export default function Menu() {
 
   return (
     <>
-      {/* ── DESKTOP: barra lateral izquierda (igual que antes) ── */}
       <nav className="hidden md:flex bg-gray-100 h-screen w-17 flex-col items-center justify-between py-5">
         <div className="flex flex-col gap-6 text-2xl relative">
           {links.map(({ to, icon, label }) => (
@@ -76,7 +75,6 @@ export default function Menu() {
         </div>
       </nav>
 
-      {/* ── MÓVIL: barra inferior ── */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 flex items-center justify-around px-2 py-2">
         {links.map(({ to, icon, label }) => {
           const active = location.pathname === to;

@@ -10,10 +10,8 @@ export default function Perfil() {
   const [editando, setEditando] = useState(false);
 
   return (
-    // En móvil: solo muestra la columna del perfil (pantalla completa)
     <div className="flex h-[calc(100vh-56px)] md:h-screen">
 
-      {/* Columna perfil — en móvil ocupa todo el ancho */}
       <div className="w-full md:w-[380px] md:flex-shrink-0 h-full flex flex-col pt-4 px-2 border border-gray-200 bg-white">
         <span className="pl-4 font-semibold text-xl">Perfil</span>
         <div className="flex-1 overflow-y-auto">

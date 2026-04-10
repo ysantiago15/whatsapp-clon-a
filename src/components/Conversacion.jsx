@@ -11,8 +11,6 @@ import {
     collection, addDoc, onSnapshot, orderBy, query, serverTimestamp
 } from "firebase/firestore"
 import { db } from "../config/firebase"
-
-// onBack → función para volver a la lista en móvil
 export default function Conversacion({ contacto, usuarioActual, onBack }) {
 
     const [mensajes, setMensajes] = useState([])
@@ -97,7 +95,6 @@ export default function Conversacion({ contacto, usuarioActual, onBack }) {
             {/* Header */}
             <div className="w-full h-16 bg-white flex pr-2 items-center justify-between border-b border-gray-200 shadow-sm z-10">
                 <div className="flex items-center gap-2 ml-2">
-                    {/* Botón volver — solo visible en móvil */}
                     {onBack && (
                         <button onClick={onBack} className="md:hidden p-2 rounded-full hover:bg-gray-100 transition">
                             <IoArrowBack className="text-xl text-gray-600" />
@@ -120,13 +117,11 @@ export default function Conversacion({ contacto, usuarioActual, onBack }) {
                 </div>
 
                 <div className="flex items-center gap-1 md:gap-3">
-                    {/* Botón llamar — oculto en móvil pequeño para no saturar */}
                     <button className="hidden sm:flex items-center border-gray-400 border px-4 py-2 rounded-full gap-3 hover:bg-gray-100 transition cursor-pointer">
                         <IoVideocamOutline className="text-xl" />
                         <span className="font-medium">Llamar</span>
                         <IoChevronDown className="text-lg pt-1" />
                     </button>
-                    {/* En móvil solo el icono de cámara */}
                     <button className="sm:hidden p-2 rounded-full hover:bg-gray-100 transition">
                         <IoVideocamOutline className="text-xl" />
                     </button>
@@ -148,7 +143,7 @@ export default function Conversacion({ contacto, usuarioActual, onBack }) {
                 </div>
             </div>
 
-            {/* Área de mensajes */}
+            
             <div className="flex-1 overflow-y-auto relative"
                 style={{ backgroundImage: `url(${fondo})`, backgroundSize: "cover", backgroundPosition: "center" }}>
 

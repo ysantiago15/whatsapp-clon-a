@@ -13,8 +13,7 @@ export function UserProvider({ children }) {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        // Busca en Firestore el documento que tenga
-        // el mismo número de teléfono con el que se logueó
+        
         const q = query(
           collection(db, "users"),
           where("telefono", "==", firebaseUser.phoneNumber)
@@ -24,8 +23,8 @@ export function UserProvider({ children }) {
         if (!snapshot.empty) {
           const docSnap = snapshot.docs[0];
           setUserData({
-            docId: docSnap.id,       // el ID del documento en Firestore
-            ...docSnap.data()         // nombre, foto, Estado, telefono, online
+            docId: docSnap.id,       
+            ...docSnap.data()         
           });
         }
       } else {
@@ -44,5 +43,4 @@ export function UserProvider({ children }) {
   );
 }
 
-// Este hook es el que usas en cualquier componente para leer los datos
 export const useUser = () => useContext(UserContext);

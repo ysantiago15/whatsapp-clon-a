@@ -23,7 +23,6 @@ export default function Canales() {
     return (
         <div className="flex h-[calc(100vh-56px)] md:h-screen">
 
-            {/* Lista de canales — oculta en móvil si hay canal seleccionado */}
             <div className={`
                 ${canalSeleccionado ? "hidden" : "flex"} md:flex
                 w-full md:w-[380px] md:flex-shrink-0
@@ -76,7 +75,6 @@ export default function Canales() {
                 </div>
             </div>
 
-            {/* Panel derecho */}
             <div className={`
                 ${canalSeleccionado ? "flex" : "hidden"} md:flex
                 flex-1 bg-[#F7F5F3] flex-col items-center justify-center gap-4 border-t-4 border-[#00a884]

@@ -199,7 +199,6 @@ export default function Chats({ onLogout }) {
                     <Conversacion
                         contacto={contactoSeleccionado}
                         usuarioActual={userData}
-                        // Le pasamos la función para volver atrás en móvil
                         onBack={() => setContactoSeleccionado(null)}
                     />
                 ) : (

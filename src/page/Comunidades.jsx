@@ -69,11 +69,9 @@ export default function Comunidades() {
                                 </div>
                             </div>
 
-                            {/* Canales dentro de la comunidad */}
                             <div className="pl-4 pr-4 pb-2">
                                 {comunidad.canales.map((canal, i) => (
                                     <div key={i} className="flex items-center gap-3 py-2 px-2 hover:bg-gray-100 rounded-lg cursor-pointer transition">
-                                        {/* Ícono de altavoz para los canales de aviso */}
                                         <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
                                             <MdGroup size={18} className="text-green-600" />
                                         </div>
@@ -96,7 +94,6 @@ export default function Comunidades() {
 
             </div>
 
-            {/* ── Panel derecho decorativo ── */}
             <div className="flex-1 bg-[#F7F5F3] flex flex-col items-center justify-center gap-4 border-t-4 border-[#00a884]">
                 <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
                     <MdGroup size={40} className="text-gray-400" />

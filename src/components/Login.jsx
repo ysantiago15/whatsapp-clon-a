@@ -62,10 +62,8 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    // En móvil: columna (banner arriba, form abajo). En desktop: fila (lateral)
     <div className="min-h-screen w-screen flex flex-col md:flex-row bg-white">
 
-      {/* Panel verde — en móvil es más compacto arriba */}
       <div className="w-full md:w-[420px] md:flex-shrink-0 bg-[#00a884] flex flex-col items-center justify-center px-8 py-10 md:py-16 gap-4 md:gap-6">
         <svg viewBox="0 0 48 48" className="w-14 h-14 md:w-20 md:h-20 fill-white" xmlns="http://www.w3.org/2000/svg">
           <path d="M24 4C13 4 4 13 4 24c0 3.6 1 7 2.7 10L4 44l10.3-2.7C17.1 43 20.5 44 24 44c11 0 20-9 20-20S35 4 24 4zm0 36c-3.1 0-6.1-.8-8.7-2.4l-.6-.4-6.1 1.6 1.6-5.9-.4-.6C8.8 30.2 8 27.1 8 24c0-8.8 7.2-16 16-16s16 7.2 16 16-7.2 16-16 16zm8.7-11.8c-.5-.2-2.8-1.4-3.2-1.5-.4-.2-.7-.2-1 .2-.3.4-1.2 1.5-1.5 1.9-.3.3-.5.4-1 .1-.5-.2-2-.7-3.8-2.3-1.4-1.2-2.3-2.8-2.6-3.2-.3-.5 0-.7.2-1 .2-.2.5-.6.7-.9.2-.3.3-.5.4-.8.1-.3 0-.6-.1-.9-.1-.2-1-2.4-1.4-3.3-.4-.9-.7-.7-1-.7h-.9c-.3 0-.8.1-1.2.6-.4.5-1.6 1.5-1.6 3.8s1.6 4.4 1.8 4.7c.2.3 3.2 4.9 7.8 6.8 1.1.5 1.9.7 2.6.9 1.1.3 2.1.3 2.9.2.9-.1 2.8-1.1 3.2-2.2.4-1.1.4-2 .3-2.2-.2-.2-.5-.3-1-.5z"/>
@@ -77,7 +75,6 @@ export default function Login({ onLogin }) {
         </p>
       </div>
 
-      {/* Panel formulario */}
       <div className="flex-1 flex flex-col items-center justify-center bg-[#f0f2f5] px-4 py-8 md:px-8">
         <div className="bg-white w-full max-w-sm rounded-2xl shadow-sm p-6 md:p-8">
 

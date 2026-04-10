@@ -31,7 +31,6 @@ export default function AppRouter() {
             path="/*"
             element={
               autenticado ? (
-                // En móvil: columna (menú abajo), en desktop: fila (menú lateral)
                 <div className="flex flex-col-reverse md:flex-row h-screen overflow-hidden">
                   <Menu />
                   <div className="flex-1 min-h-0">
