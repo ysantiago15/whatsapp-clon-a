@@ -122,14 +122,14 @@ export default function Estados() {
                 </div>
             </div>
 
-            {
+
             <div className={`
                 ${estadoViendo ? "flex" : "hidden"} md:flex
                 flex-1 bg-[#F7F5F3] flex-col items-center justify-center
             `}>
                 {estadoViendo ? (
                     <div className="relative w-full h-full flex flex-col items-center justify-center bg-black">
-                        {/* Botón cerrar */}
+
                         <button
                             onClick={() => setEstadoViendo(null)}
                             className="absolute top-4 right-4 text-white bg-black/40 p-2 rounded-full hover:bg-black/60 transition z-10">
@@ -144,9 +144,9 @@ export default function Estados() {
                             </div>
                         </div>
                         <img
-                            src={estadoViendo.imagen}
-                            alt="estado"
-                            className="max-h-[80vh] max-w-[90%] md:max-w-[80%] object-contain rounded-xl"
+                            src={estadoViendo.foto}
+                            alt={estadoViendo.nombre}
+                            className="w-10 h-10 rounded-full object-cover border-2 border-green-400"
                         />
                     </div>
                 ) : (

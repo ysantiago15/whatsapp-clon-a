@@ -1,168 +1,155 @@
-// src/components/Login.jsx
-import { useState, useRef } from "react";
-import { sendCode, verifyCode } from "../services/phoneAuth";
+import { useState, useRef, useEffect } from "react";
+import { auth } from "../config/firebase";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+} from "firebase/auth";
 
-export default function Login({ onLogin }) {
-  const [step, setStep] = useState(1);
+export default function Login() {
   const [phone, setPhone] = useState("");
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [code, setCode] = useState("");
+  const [step, setStep] = useState("phone"); // "phone" | "code"
   const [loading, setLoading] = useState(false);
-  const [timer, setTimer] = useState(30);
+  const [error, setError] = useState("");
+  const confirmationRef = useRef(null);
 
-  const inputsRef = useRef([]);
+ useEffect(() => {
+  const setupRecaptcha = () => {
+    if (window.recaptchaVerifier) return;
+    
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      auth,
+      "recaptcha-container",
+      {
+        size: "invisible",
+        callback: () => {},
+        "expired-callback": () => {
+          window.recaptchaVerifier?.clear();
+          window.recaptchaVerifier = null;
+          setupRecaptcha();
+        },
+      }
+    );
+    window.recaptchaVerifier.render().catch(console.error);
+  };
 
-  const handleSend = async () => {
+  setupRecaptcha();
+
+  return () => {
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = null;
+    }
+  };
+}, []);
+
+  const sendCode = async () => {
+    setError("");
+    if (!phone.startsWith("+")) {
+      setError("Incluye el código de país. Ej: +573001234567");
+      return;
+    }
+    setLoading(true);
     try {
-      setLoading(true);
-      await sendCode(phone);
-      setStep(2);
-      startTimer();
-    } catch (error) {
-      alert("Error enviando código");
-    } finally {
-      setLoading(false);
+      const confirmation = await signInWithPhoneNumber(
+        auth,
+        phone,
+        window.recaptchaVerifier
+      );
+      confirmationRef.current = confirmation;
+      setStep("code");
+    } catch (err) {
+      setError("Error al enviar SMS. Verifica el número.");
+      console.error(err);
+      // Resetear recaptcha si falla
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = null;
     }
+    setLoading(false);
   };
 
-  const handleVerify = async () => {
-    const finalCode = code.join("");
+  const verifyCode = async () => {
+    setError("");
+    setLoading(true);
     try {
-      setLoading(true);
-      await verifyCode(finalCode);
-      onLogin();
-    } catch {
-      alert("Código incorrecto");
-    } finally {
-      setLoading(false);
+      await confirmationRef.current.confirm(code);
+      // onAuthStateChanged en UserContext detecta el login automáticamente
+    } catch (err) {
+      setError("Código incorrecto. Intenta de nuevo.");
+      console.error(err);
     }
-  };
-
-  const startTimer = () => {
-    let count = 30;
-    setTimer(count);
-    const interval = setInterval(() => {
-      count--;
-      setTimer(count);
-      if (count === 0) clearInterval(interval);
-    }, 1000);
-  };
-
-  const handleChange = (value, index) => {
-    if (!/^\d*$/.test(value)) return;
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
-    if (value && index < 5) inputsRef.current[index + 1].focus();
-  };
-
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      inputsRef.current[index - 1].focus();
-    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col md:flex-row bg-white">
+    <div className="min-h-screen bg-[#111b21] flex flex-col items-center justify-center px-4">
+      <div id="recaptcha-container" />
 
-      <div className="w-full md:w-[420px] md:flex-shrink-0 bg-[#00a884] flex flex-col items-center justify-center px-8 py-10 md:py-16 gap-4 md:gap-6">
-        <svg viewBox="0 0 48 48" className="w-14 h-14 md:w-20 md:h-20 fill-white" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 4C13 4 4 13 4 24c0 3.6 1 7 2.7 10L4 44l10.3-2.7C17.1 43 20.5 44 24 44c11 0 20-9 20-20S35 4 24 4zm0 36c-3.1 0-6.1-.8-8.7-2.4l-.6-.4-6.1 1.6 1.6-5.9-.4-.6C8.8 30.2 8 27.1 8 24c0-8.8 7.2-16 16-16s16 7.2 16 16-7.2 16-16 16zm8.7-11.8c-.5-.2-2.8-1.4-3.2-1.5-.4-.2-.7-.2-1 .2-.3.4-1.2 1.5-1.5 1.9-.3.3-.5.4-1 .1-.5-.2-2-.7-3.8-2.3-1.4-1.2-2.3-2.8-2.6-3.2-.3-.5 0-.7.2-1 .2-.2.5-.6.7-.9.2-.3.3-.5.4-.8.1-.3 0-.6-.1-.9-.1-.2-1-2.4-1.4-3.3-.4-.9-.7-.7-1-.7h-.9c-.3 0-.8.1-1.2.6-.4.5-1.6 1.5-1.6 3.8s1.6 4.4 1.8 4.7c.2.3 3.2 4.9 7.8 6.8 1.1.5 1.9.7 2.6.9 1.1.3 2.1.3 2.9.2.9-.1 2.8-1.1 3.2-2.2.4-1.1.4-2 .3-2.2-.2-.2-.5-.3-1-.5z"/>
-        </svg>
-        <h1 className="text-white text-2xl md:text-3xl font-light tracking-wide">WhatsApp Web</h1>
-        <p className="text-white/80 text-sm text-center leading-relaxed hidden md:block">
-          Envía y recibe mensajes sin tener tu teléfono en línea.
-          Usa WhatsApp en hasta 4 dispositivos vinculados.
-        </p>
-      </div>
-
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#f0f2f5] px-4 py-8 md:px-8">
-        <div className="bg-white w-full max-w-sm rounded-2xl shadow-sm p-6 md:p-8">
-
-          {step === 1 && (
-            <>
-              <h2 className="text-xl font-semibold text-[#111b21] mb-1">Ingresa tu número</h2>
-              <p className="text-sm text-gray-500 mb-6">WhatsApp enviará un código de verificación por SMS.</p>
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Número de teléfono</label>
-              <input
-                type="tel"
-                placeholder="+57 300 123 4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="w-full border-b-2 border-gray-200 focus:border-[#00a884] outline-none py-2 mb-6 text-[#111b21] text-base transition-colors duration-200 bg-transparent"
-              />
-              <button
-                onClick={handleSend}
-                disabled={loading || !phone}
-                className="w-full bg-[#00a884] hover:bg-[#017a62] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-full font-semibold transition-colors duration-200 text-sm"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4"/>
-                      <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z"/>
-                    </svg>
-                    Enviando...
-                  </span>
-                ) : "Enviar código"}
-              </button>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <button onClick={() => setStep(1)} className="flex items-center gap-1 text-[#00a884] text-sm mb-5 hover:underline">
-                ← Cambiar número
-              </button>
-              <h2 className="text-xl font-semibold text-[#111b21] mb-1">Verifica tu número</h2>
-              <p className="text-sm text-gray-500 mb-2">Ingresa el código de 6 dígitos enviado a</p>
-              <p className="text-sm font-semibold text-[#111b21] mb-6">{phone}</p>
-              <div className="flex justify-between gap-2 mb-6">
-                {code.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(el) => (inputsRef.current[index] = el)}
-                    type="text"
-                    inputMode="numeric"
-                    maxLength="1"
-                    value={digit}
-                    onChange={(e) => handleChange(e.target.value, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    className="w-11 h-13 text-center border-b-2 border-gray-300 focus:border-[#00a884] outline-none text-xl font-semibold text-[#111b21] transition-colors duration-200 bg-transparent"
-                  />
-                ))}
-              </div>
-              <button
-                onClick={handleVerify}
-                disabled={loading || code.some((d) => d === "")}
-                className="w-full bg-[#00a884] hover:bg-[#017a62] disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-full font-semibold transition-colors duration-200 text-sm"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4"/>
-                      <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z"/>
-                    </svg>
-                    Verificando...
-                  </span>
-                ) : "Verificar"}
-              </button>
-              <p className="text-center text-sm text-gray-400 mt-5">
-                {timer > 0 ? `Reenviar código en ${timer}s` : (
-                  <span onClick={handleSend} className="text-[#00a884] font-semibold cursor-pointer hover:underline">Reenviar código</span>
-                )}
-              </p>
-            </>
-          )}
+      <div className="w-full max-w-sm bg-[#202c33] rounded-2xl p-8 shadow-xl">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="bg-[#00a884] rounded-full p-4 mb-3">
+            <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </div>
+          <h1 className="text-white text-2xl font-bold">WhatsApp</h1>
+          <p className="text-[#8696a0] text-sm mt-1">
+            {step === "phone" ? "Ingresa tu número" : "Verifica tu número"}
+          </p>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6 text-center">
-          Al continuar, aceptas nuestros{" "}
-          <span className="text-[#00a884] cursor-pointer hover:underline">Términos del servicio</span>{" "}
-          y{" "}
-          <span className="text-[#00a884] cursor-pointer hover:underline">Política de privacidad</span>.
-        </p>
-        <div id="recaptcha-container"></div>
+        {step === "phone" ? (
+          <>
+            <p className="text-[#8696a0] text-xs text-center mb-4">
+              WhatsApp enviará un SMS con tu código de verificación.
+            </p>
+            <input
+              type="tel"
+              placeholder="+57 300 123 4567"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full bg-[#2a3942] text-white placeholder-[#8696a0] border-b-2 border-[#00a884] rounded-lg px-4 py-3 text-center text-lg outline-none mb-4"
+            />
+            {error && <p className="text-red-400 text-xs text-center mb-3">{error}</p>}
+            <button
+              onClick={sendCode}
+              disabled={loading || !phone}
+              className="w-full bg-[#00a884] hover:bg-[#02b991] disabled:opacity-50 text-white font-semibold py-3 rounded-full transition"
+            >
+              {loading ? "Enviando..." : "Enviar código"}
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-[#8696a0] text-xs text-center mb-1">
+              Código enviado a
+            </p>
+            <p className="text-white text-sm text-center font-semibold mb-4">{phone}</p>
+            <input
+              type="number"
+              placeholder="_ _ _ _ _ _"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              maxLength={6}
+              className="w-full bg-[#2a3942] text-white placeholder-[#8696a0] border-b-2 border-[#00a884] rounded-lg px-4 py-3 text-center text-2xl tracking-widest outline-none mb-4"
+            />
+            {error && <p className="text-red-400 text-xs text-center mb-3">{error}</p>}
+            <button
+              onClick={verifyCode}
+              disabled={loading || code.length < 6}
+              className="w-full bg-[#00a884] hover:bg-[#02b991] disabled:opacity-50 text-white font-semibold py-3 rounded-full transition mb-3"
+            >
+              {loading ? "Verificando..." : "Verificar"}
+            </button>
+            <button
+              onClick={() => { setStep("phone"); setCode(""); setError(""); }}
+              className="w-full text-[#00a884] text-sm py-2 hover:underline"
+            >
+              Cambiar número
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

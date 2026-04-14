@@ -1,46 +1,26 @@
-// src/context/UserContext.jsx
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { auth, db } from "../config/firebase";
+import { auth } from "../config/firebase";
 
-const UserContext = createContext(null);
+const UserContext = createContext();
 
-export function UserProvider({ children }) {
-  const [userData, setUserData] = useState(null);
+export const UserProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        
-        const q = query(
-          collection(db, "users"),
-          where("telefono", "==", firebaseUser.phoneNumber)
-        );
-        const snapshot = await getDocs(q);
-
-        if (!snapshot.empty) {
-          const docSnap = snapshot.docs[0];
-          setUserData({
-            docId: docSnap.id,       
-            ...docSnap.data()         
-          });
-        }
-      } else {
-        setUserData(null);
-      }
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
       setLoading(false);
     });
-
-    return () => unsub();
+    return unsub;
   }, []);
 
   return (
-    <UserContext.Provider value={{ userData, setUserData, loading }}>
+    <UserContext.Provider value={{ user, loading }}>
       {children}
     </UserContext.Provider>
   );
-}
+};
 
 export const useUser = () => useContext(UserContext);
